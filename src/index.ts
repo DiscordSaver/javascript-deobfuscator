@@ -5,6 +5,7 @@ import Modification from './modification';
 import ProxyRemover from './modifications/proxies/proxyRemover';
 import ExpressionSimplifier from './modifications/expressions/expressionSimplifier';
 import ArrayUnpacker from './modifications/arrays/arrayUnpacker';
+import ObjectUnpacker from './modifications/objects/objectUnpacker';
 import PropertySimplifier from './modifications/properties/propertySimplifier';
 import CleanupHelper from './helpers/cleanupHelper';
 import Config from './config';
@@ -28,6 +29,10 @@ export function deobfuscate(source: string, config: Config): string {
 
     if (config.arrays.unpackArrays) {
         modifications.push(new ArrayUnpacker(ast, config.arrays.removeArrays));
+    }
+
+    if (config.objects.unpackObjects) {
+        modifications.push(new ObjectUnpacker(ast, config.objects.removeObjects));
     }
 
     // simplify any expressions that were revealed by the array unpacking

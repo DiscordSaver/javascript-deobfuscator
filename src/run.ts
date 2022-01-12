@@ -7,6 +7,10 @@ const config = {
         unpackArrays: true,
         removeArrays: true
     },
+    objects: {
+        unpackObjects: true,
+        removeObjects: true
+    },
     proxyFunctions: {
         replaceProxyFunctions: true,
         removeProxyFunctions: true

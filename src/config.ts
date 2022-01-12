@@ -1,5 +1,6 @@
 export default interface Config {
     arrays: ArraysConfig;
+    objects: ObjectsConfig;
     proxyFunctions: ProxyFunctionsConfig;
     expressions: ExpressionsConfig;
     miscellaneous: MiscellaneousConfig;
@@ -8,6 +9,11 @@ export default interface Config {
 interface ArraysConfig {
     unpackArrays: boolean;
     removeArrays: boolean;
+}
+
+interface ObjectsConfig {
+    unpackObjects: boolean;
+    removeObjects: boolean;
 }
 
 interface ProxyFunctionsConfig {
