@@ -17,8 +17,8 @@ export default class ObjectUnpacker extends Modification {
      */
     constructor(ast: Shift.Script, removeObjects: boolean) {
         super('Unpack objects', ast);
-        this.globalScope = new Scope(this.ast);
         this.shouldRemoveObjects = removeObjects;
+        this.globalScope = new Scope(this.ast);
     }
 
     /**
@@ -27,10 +27,6 @@ export default class ObjectUnpacker extends Modification {
     execute(): void {
         this.findObjects();
         this.unpackObjects();
-     
-        if (this.shouldRemoveObjects) {
-            this.removeObject(this.globalScope);
-        }
     }
 
     /**
@@ -67,6 +63,7 @@ export default class ObjectUnpacker extends Modification {
     private unpackObjects(): void {
         const self = this;
         let scope = this.globalScope;
+        let remove = this.shouldRemoveObjects
 
         traverse(this.ast, {
             enter(node: Shift.Node, parent: Shift.Node) {
@@ -86,13 +83,17 @@ export default class ObjectUnpacker extends Modification {
                         }
 
                         const replacement = objectArray.elements.properties.find(e => e && e.type == 'DataProperty' && e.name.type == 'StaticPropertyName' && e.name.value == index);
-                        var expression = (replacement as any).expression
+                        if (replacement) {
+                            var expression = (replacement as any).expression
 
-                        if (expression) {
-                            if ((expression as any).type == "LiteralStringExpression" || (expression as any).type == 'BinaryExpression') {
-                                    scope.addNodeRemoval((replacement as any), objectArray.elements)
+                            if (expression) {
+                                if ((expression as any).type == "LiteralStringExpression") {
+                                    if (remove) {
+                                        TraversalHelper.removeNode(objectArray.elements, (replacement as any));
+                                    }
                                     objectArray.replaceCount++;
                                     TraversalHelper.replaceNode(parent, node, expression);
+                                }
                             }
                         }
                     }
@@ -104,16 +105,6 @@ export default class ObjectUnpacker extends Modification {
                 }
             }
         });
-    }
-
-    /**
-     * Removes all the (suitable) objects in a scope and its children.
-     * @param scope The scope to remove objects from.
-     */
-    private removeObject(scope: Scope): void {
-        for (const element of scope.remove) {
-            TraversalHelper.removeNode(element[1], element[0]);
-        }
     }
 
     /**
